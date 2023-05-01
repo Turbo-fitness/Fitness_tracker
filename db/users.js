@@ -9,7 +9,7 @@ async function createUser({ username, password }) {
       INSERT INTO users(username, password)
       VALUES($1, $2)
       ON CONFLICT (username) DO NOTHING
-      RETURNING *;
+      RETURNING username, id;
     `, [username, password]);
 
     return user;
@@ -26,9 +26,20 @@ async function getUserById(userId) {
 
 }
 
-async function getUserByUsername(userName) {
+async function getUserByUsername(username) {
+  try {
+    const { rows: [user] } = await client.query(`
+      SELECT *
+      FROM users
+      WHERE username=$1;
+    `, [username]);
 
+    return user;
+  } catch (error) {
+    throw error;
+  }
 }
+
 
 module.exports = {
   createUser,
