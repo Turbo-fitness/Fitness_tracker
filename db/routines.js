@@ -9,7 +9,7 @@ try{
   RETURNING *;
   `, [creatorId, isPublic, name, goal]
   );
-console.log("this is my routines", routine)
+
   return routine;
   }catch (error){
     console.error("could not create routine");
@@ -23,9 +23,8 @@ async function getAllRoutines() {
   try{
     const { rows: routines } = await client.query(`
     
-    SELECT routines.*, users.username AS "createorName" 
+    SELECT routines.*, users.username AS "creatorName" 
     FROM routines
-    
     `
     );
   
