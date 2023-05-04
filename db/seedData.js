@@ -2,7 +2,7 @@
 // const { } = require('./');
 const client = require("./client")
 const {createUser} = require("./users")
-const {createActivity} = require ("./activities")
+const {createActivity, getAllActivities } = require ("./activities")
 const {createRoutine, getRoutinesWithoutActivities } = require ("./routines")
 console.log("this is =>>>>>", createUser)
 
