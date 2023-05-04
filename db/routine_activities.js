@@ -16,15 +16,100 @@ async function addActivityToRoutine({ routineId, activityId, count, duration }) 
 }
 
 
-async function getRoutineActivityById(id) {}
+async function getRoutineActivityById(id) {
+  try {
+    const { rows: [routineActivity] } = await client.query(`
+      SELECT *
+      FROM routine_activities
+      WHERE id=$1
+    `, [id]);
 
-async function getRoutineActivitiesByRoutine({ id }) {}
+    return routineActivity;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-async function updateRoutineActivity({ id, ...fields }) {}
+async function getRoutineActivitiesByRoutine({ id }) {
+  try {
+    const { rows: routineActivities } = await client.query(`
+      SELECT *
+      FROM routine_activities
+      JOIN activities ON routine_activities."activityId" = activities.id
+      WHERE routine_activities."routineId" = $1
+    `, [id]);
 
-async function destroyRoutineActivity(id) {}
+    return routineActivities;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-async function canEditRoutineActivity(routineActivityId, userId) {}
+async function updateRoutineActivity({ id, count, duration }) {
+  try {
+    const { rows: [routineActivity] } = await client.query(`
+      UPDATE routine_activities
+      SET count=$1, duration=$2
+      WHERE id=$3
+      RETURNING *
+    `, [count, duration, id]);
+
+    if (!routineActivity) {
+      throw Error(`Routine activity with id ${id} not found`);
+    }
+
+    return routineActivity;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function destroyRoutineActivity(id) {
+  try {
+    const { rows: [routineActivity] } = await client.query(`
+      DELETE FROM routine_activities
+      WHERE id=$1
+      RETURNING *
+    `, [id]);
+
+    if (!routineActivity) {
+      throw Error(`Routine activity with id ${id} not found`);
+    }
+
+    return routineActivity;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function canEditRoutineActivity(routineActivityId, userId) {
+  try {
+    const { rows: [routineActivity] } = await client.query(`
+      SELECT routines.*
+      FROM routine_activities
+      JOIN routines ON routines.id = routine_activities."routineId"
+      WHERE routine_activities.id = $1
+    `, [routineActivityId]);
+
+    if (!routineActivity) {
+      return false;
+    //  throw Error(`No routine activity with id ${routineActivityId}`);
+    }
+
+    if (routineActivity.creatorId === userId) {
+      return true;
+    }
+
+    // if (routineActivity.isPublic) {
+    //   return true;
+    // }
+
+    return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
 
 module.exports = {
   getRoutineActivityById,
