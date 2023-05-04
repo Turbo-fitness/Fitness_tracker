@@ -4,6 +4,7 @@ const client = require("./client")
 const {createUser} = require("./users")
 const {createActivity, getAllActivities } = require ("./activities")
 const {createRoutine, getRoutinesWithoutActivities } = require ("./routines")
+const { addActivityToRoutine } = require ("./routine_activities")
 console.log("this is =>>>>>", createUser)
 
 async function dropTables() {
@@ -24,7 +25,7 @@ async function dropTables() {
     throw error; 
   }
 }
-
+ 
 async function createTables() {
   console.log("Starting to build tables...")
   try {

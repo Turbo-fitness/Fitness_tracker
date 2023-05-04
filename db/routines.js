@@ -80,7 +80,22 @@ async function getRoutineById(id) {
   }
 }
 
-async function getRoutinesWithoutActivities() {}
+async function getRoutinesWithoutActivities() {
+  try {
+    const { rows: routines } = await client.query(`
+    SELECT *
+<<<<<<< Updated upstream
+    FROM routines  
+=======
+    FROM routines
+  
+>>>>>>> Stashed changes
+    `)
+    return routines;
+  } catch(error){
+    console.error(error);
+  }
+}
 
 async function getAllRoutines() {
   
@@ -209,11 +224,13 @@ async function updateRoutine({ id, ...fields }) {
 
 async function destroyRoutine(id) {
   try {
+    // Delete all routine_activities whose routine is the one being deleted
     await client.query(`
       DELETE FROM routine_activities
       WHERE "routineId"=$1
     `, [id]);
 
+    // Remove the routine from the database
     const { rows } = await client.query(`
       DELETE FROM routines
       WHERE id=$1
