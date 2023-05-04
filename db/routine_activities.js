@@ -29,13 +29,14 @@ async function getRoutineActivityById(id) {
     console.error(error);
   }
 }
+ 
+
 
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: routineActivities } = await client.query(`
       SELECT *
       FROM routine_activities
-      JOIN activities ON routine_activities."activityId" = activities.id
       WHERE routine_activities."routineId" = $1
     `, [id]);
 
@@ -44,7 +45,6 @@ async function getRoutineActivitiesByRoutine({ id }) {
     console.error(error);
   }
 }
-
 async function updateRoutineActivity({ id, count, duration }) {
   try {
     const { rows: [routineActivity] } = await client.query(`
