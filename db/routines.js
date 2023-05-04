@@ -1,6 +1,23 @@
-
+/* eslint-disable no-useless-catch */
 const client = require("./client");
 
+
+function dbFields(fields) {
+  const insert = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(', ');
+  // then we can use: (${ insert }) in our string template
+
+  // need something like $1, $2, $3
+  const select = Object.keys(fields)
+    .map((_, index) => `$${index + 1}`)
+    .join(', ');
+  // then we can use (${ select }) in our string template
+
+  const vals = Object.values(fields);
+  return { insert, select, vals };
+}
+// used as a helper inside db/routines.js
 async function attachActivitiesToRoutines(routines) {
   const routinesToReturn = [...routines]; // prevents unwanted side effects.
   // $1, $2, $3
@@ -30,7 +47,7 @@ async function attachActivitiesToRoutines(routines) {
     routine.activities = activitiesToAdd;
   }
 
-  //console.log('these are my routines: ----->', routines[3]);
+  console.log('these are my routines: ----->', routines[3]);
   // console.log('these are my routines: ----->', routines[3].activities);
   return routinesToReturn;
 }
@@ -66,14 +83,16 @@ async function getRoutineById(id) {
 async function getRoutinesWithoutActivities() {}
 
 async function getAllRoutines() {
-  // eslint-disable-next-line no-useless-catch
+  
   try {
     const { rows: routines } = await client.query(
       `
        SELECT routines.*, users.username AS "creatorName"
        FROM routines
        JOIN users ON routines."creatorId" = users.id
-    `);
+    `
+    );
+
     return await attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
@@ -82,29 +101,99 @@ async function getAllRoutines() {
 
 
 async function getAllPublicRoutines() {
+  
   try {
-    const { rows: routines } = await client.query(`
-      SELECT routines.*, users.username AS "creatorName"
+    const { rows: routines } = await client.query(
+      `
+      SELECT DISTINCT routines.*, users.username AS "creatorName"
       FROM routines
       JOIN users ON users.id = routines."creatorId"
+      JOIN routine_activities ON routines.id = routine_activities."routineId"
       WHERE "isPublic" = true
-    `);
+      `);
 
+      console.log("these here are them public routines",routines.isPublic )
     return await attachActivitiesToRoutines(routines);
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
-async function getAllRoutinesByUser({ username }) {}
+async function getAllRoutinesByUser({ username }) {
+  try {
+    const { rows: routines } = await client.query(
+      `
+      Select routines.*, users.username AS "creatorName"
+      FROM routines
+      JOIN users ON users.id = routines."creatorId"
+      WHERE users.username = $1
+      `,
+      [username]
+      );
 
-async function getPublicRoutinesByUser({ username }) {}
+      
+    return await attachActivitiesToRoutines(routines);
+  } catch (error) {
+    throw error;
+  }
+}
 
-async function getPublicRoutinesByActivity({ id }) {}
 
+
+async function getPublicRoutinesByUser({ username }) {
+  try {
+    const { rows: routines } = await client.query(
+      `
+      Select routines.*, users.username AS "creatorName"
+      FROM routines
+      JOIN users ON users.id = routines."creatorId"
+      WHERE routines. "isPublic" = true 
+      AND users.username = $1
+      `,
+      [username]
+      );
+
+      
+    return await attachActivitiesToRoutines(routines);
+  } catch (error) {
+    throw error;
+  }
+
+}
+
+
+
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+    const { rows: routines } = await client.query(
+      `     
+      SELECT routines.*, users.username AS "creatorName"
+      FROM routines
+      JOIN users ON users.id = routines."creatorId"
+      JOIN routine_activities ON routines.id = routine_activities."routineId"
+      WHERE routines."isPublic" = true
+      AND routine_activities."activityId" = $1
+      
+      `, [id] 
+      );
+      
+      
+      return await attachActivitiesToRoutines(routines);
+    } catch (error) {
+      throw error;
+      
+    }
+    
+  }
+  
+  
+  
+  
 async function updateRoutine({ id, ...fields }) {}
 
 async function destroyRoutine(id) {}
+
+
 
 module.exports = {
   getRoutineById,
