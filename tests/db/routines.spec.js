@@ -408,7 +408,7 @@ describe("DB Routines", () => {
   });
 
   describe("updateRoutine", () => {
-    xit("Returns the updated routine", async () => {
+    it("Returns the updated routine", async () => {
       const fakeRoutine = await createFakePublicRoutine();
 
       const updatedRoutine = await updateRoutine({
@@ -421,7 +421,7 @@ describe("DB Routines", () => {
       expect(updatedRoutine.id).toEqual(fakeRoutine.id);
     });
 
-    xit("Updates the public status, name, or goal, as necessary", async () => {
+    it("Updates the public status, name, or goal, as necessary", async () => {
       const fakeRoutine = await createFakePublicRoutine();
 
       const name = faker.random.uuid();
@@ -439,7 +439,7 @@ describe("DB Routines", () => {
       expect(updatedRoutine.goal).toBe(goal);
     });
 
-    xit("Does not update fields that are not passed in", async () => {
+    it("Does not update fields that are not passed in", async () => {
       const fakeRoutine = await createFakePublicRoutine();
       const name = faker.random.uuid();
       const updatedRoutine = await updateRoutine({
@@ -453,7 +453,7 @@ describe("DB Routines", () => {
   });
 
   describe("destroyRoutine", () => {
-    xit("removes routine from database", async () => {
+    it("removes routine from database", async () => {
       const fakeRoutine = await createFakePublicRoutine();
       await destroyRoutine(fakeRoutine.id);
       const {
@@ -469,7 +469,7 @@ describe("DB Routines", () => {
       expect(routine).toBeFalsy();
     });
 
-    xit("Deletes all the routine_activities whose routine is the one being deleted.", async () => {
+    it("Deletes all the routine_activities whose routine is the one being deleted.", async () => {
       const { fakeRoutines, fakeRoutineActivities } =
         await createFakeUserWithRoutinesAndActivities("Jackie");
       const fakeRoutine = fakeRoutines[0];
