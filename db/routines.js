@@ -47,7 +47,7 @@ async function attachActivitiesToRoutines(routines) {
     routine.activities = activitiesToAdd;
   }
 
-  console.log('these are my routines: ----->', routines[3]);
+  //console.log('these are my routines: ----->', routines[3]);
   // console.log('these are my routines: ----->', routines[3].activities);
   return routinesToReturn;
 }
@@ -112,7 +112,7 @@ async function getAllPublicRoutines() {
       WHERE "isPublic" = true
       `);
 
-      console.log("these here are them public routines",routines.isPublic )
+      //console.log("these here are them public routines",routines.isPublic )
     return await attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
@@ -189,9 +189,47 @@ async function getPublicRoutinesByActivity({ id }) {
   
   
   
-async function updateRoutine({ id, ...fields }) {}
+async function updateRoutine({ id, ...fields }) {
+  const setString = Object.keys(fields).map(
+    (key, index) => `"${ key }"=$${ index + 1 }`
+  ).join(', ');
+  try {
+    const { rows: [routine] } = await client.query(`
+      UPDATE routines
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;
+    `, Object.values(fields));
 
-async function destroyRoutine(id) {}
+    return routine;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function destroyRoutine(id) {
+  try {
+    // Delete all routine_activities whose routine is the one being deleted
+    await client.query(`
+      DELETE FROM routine_activities
+      WHERE "routineId"=$1
+    `, [id]);
+
+    // Remove the routine from the database
+    const { rows } = await client.query(`
+      DELETE FROM routines
+      WHERE id=$1
+    `, [id]);
+
+    if (rows === 0) {
+      throw new Error(`Routine with id ${id} not found`);
+    }
+
+    return { message: "Routine deleted" };
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 
 
