@@ -67,7 +67,18 @@ try{
     console.error("could not create routine");
   }
 }
-async function getRoutineById(id) {}
+async function getRoutineById(id) {
+  try {
+    const { rows: routine } = await client.query(`
+      SELECT * FROM routines
+      WHERE id = $1;
+    `, [id]);
+
+    return routine;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 async function getRoutinesWithoutActivities() {}
 
@@ -125,8 +136,9 @@ async function getAllRoutinesByUser({ username }) {
   } catch (error) {
     throw error;
   }
-
 }
+
+
 
 async function getPublicRoutinesByUser({ username }) {
   try {
@@ -162,7 +174,7 @@ async function getPublicRoutinesByActivity({ id }) {
       WHERE routines."isPublic" = true
       AND routine_activities."activityId" = $1
       
-      `, [activityId] 
+      `, [id] 
       );
       
       
