@@ -84,12 +84,7 @@ async function getRoutinesWithoutActivities() {
   try {
     const { rows: routines } = await client.query(`
     SELECT *
-<<<<<<< Updated upstream
     FROM routines  
-=======
-    FROM routines
-  
->>>>>>> Stashed changes
     `)
     return routines;
   } catch(error){
