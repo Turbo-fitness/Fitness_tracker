@@ -31,7 +31,7 @@ async function getUserByUsername(username) {
 
     return user;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }
 
@@ -78,7 +78,7 @@ async function getUserById(userId) {
 
     return user;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }
 
