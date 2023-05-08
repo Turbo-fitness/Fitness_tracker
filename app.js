@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 });
 
 // Error Handler
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   if (err.status < 500) {
     res.status(err.status).send({
       success: false,
