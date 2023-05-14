@@ -97,7 +97,7 @@ describe("/api/users", () => {
       );
     });
 
-    xit("Throws errors for duplicate username", async () => {
+    it("Throws errors for duplicate username", async () => {
       // Create a fake user in the DB
       const { fakeUser: firstUser } = await createFakeUserWithToken();
       // Now try to create a user with the same username
@@ -118,7 +118,7 @@ describe("/api/users", () => {
       );
     });
 
-    xit("returns error if password is less than 8 characters.", async () => {
+    it("returns error if password is less than 8 characters.", async () => {
       // Create some user data with a password with 7 characters
       const newUserShortPassword = {
         username: faker.internet.userName(),
@@ -224,7 +224,7 @@ describe("/api/users", () => {
   });
 
   describe("GET /api/users/:username/routines", () => {
-    xit("Gets a list of public routines for a particular user.", async () => {
+    it("Gets a list of public routines for a particular user.", async () => {
       // Create a fake user with a bunch of routines associated
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Greg"
@@ -244,7 +244,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual([...routinesFromDB]);
     });
 
-    xit("gets a list of all routines for the logged in user", async () => {
+    it("gets a list of all routines for the logged in user", async () => {
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Angela"
       );

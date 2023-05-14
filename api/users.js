@@ -1,13 +1,13 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
-const router = express.Router();
+const usersRouter = express.Router();
 const {getUserByUsername, createUser, getUserById, getPublicRoutinesByUser, getAllRoutinesByUser} = require("../db");
 const { UserDoesNotExistError, PasswordTooShortError } = require("../errors");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // POST /api/users/login
-router.post('/login', async (req, res, next) => {
+usersRouter.post('/login', async (req, res, next) => {
 
     const { username, password } = req.body;
     const _user = await getUserByUsername(username);
@@ -51,7 +51,7 @@ router.post('/login', async (req, res, next) => {
     }
   });
 // POST /api/users/register
-router.post('/register', async (req, res, next) => {
+usersRouter.post('/register', async (req, res, next) => {
 
     const { username, password } = req.body;
     const _user = await getUserByUsername(username);
@@ -99,7 +99,7 @@ router.post('/register', async (req, res, next) => {
   });
 
 // GET /api/users/me
-router.get('/me', async (req, res, next) => {
+usersRouter.get('/me', async (req, res, next) => {
     const validToken = req.headers.authorization;
 
     if (!validToken || !validToken.startsWith('Bearer ')) {
@@ -122,7 +122,7 @@ router.get('/me', async (req, res, next) => {
     }
   });
 // GET /api/users/:username/routines
-router.get('/:username/routines', async (req, res, next) => {
+usersRouter.get('/:username/routines', async (req, res, next) => {
         try {
           const user = req.user;
           const publicRoutines = await getPublicRoutinesByUser(user.id);
@@ -133,6 +133,6 @@ router.get('/:username/routines', async (req, res, next) => {
           next(error);
         }
       });
+    
 
-
-module.exports = router;
+module.exports = usersRouter;
